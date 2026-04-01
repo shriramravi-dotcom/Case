@@ -15,7 +15,7 @@ from build123d import *
 # PARAMETERS
 # ─────────────────────────────────────────────────────────────────────────────
 OUTER_W, OUTER_D, OUTER_H = 325.75, 126.00, 22.10
-CORNER_R = 7
+CORNER_R = 6
 
 WALL_L, WALL_R, WALL_F, WALL_B = 3.00, 7.00, 5.00, 5.00
 BOT_H, TRAY_H = 15.60, 6.50
@@ -211,7 +211,7 @@ with BuildPart() as case:
                 Circle(BOSS_R_IN)
         extrude(amount=HOLE_DEPTH, mode=Mode.SUBTRACT)
 
-    # 🔥 MIRRORED MID CIRCLES (TOP) ✅ ADDED ONLY
+    # 🔥 MIRRORED MID CIRCLES (TOP)
     for i, mx in enumerate(mid_x):
         y_pos = 119.50 - 3.0
         if i == 0:
@@ -222,12 +222,64 @@ with BuildPart() as case:
                 Circle(BOSS_R_IN)
         extrude(amount=HOLE_DEPTH, mode=Mode.SUBTRACT)
 
-    # Notch
-    notch_z = NOTCH_Z_BOT + NOTCH_H/2
-    with BuildSketch(Plane.YZ.offset(-OUTER_W/2)):
-        with Locations((NOTCH_Y_CEN - OUTER_D/2, notch_z)):
-            SlotOverall(NOTCH_W, NOTCH_H)
-    extrude(amount=NOTCH_DEPTH, mode=Mode.SUBTRACT)
+    # 🔴 SLOT FEATURE
+    TL2_CIRCLE_X = 10.0
+    TL2_CIRCLE_Y = 50.50 - 12.0
+    TL2_CIRCLE_R = 4.0
+
+    TL2_SLOT_OFFSET_Y = 45.0
+    TL2_SLOT_LENGTH = 37.0
+    TL2_SLOT_WIDTH  = 2.5
+
+    with BuildSketch(Plane.XY.offset(OUTER_H)):
+        with Locations(C(TL2_CIRCLE_X, TL2_CIRCLE_Y)):
+            Circle(TL2_CIRCLE_R)
+    extrude(amount=-OUTER_H, mode=Mode.SUBTRACT)
+
+    with BuildSketch(Plane.XY.offset(OUTER_H)):
+        with Locations(
+            Location(C(TL2_CIRCLE_X, TL2_CIRCLE_Y + TL2_SLOT_OFFSET_Y)) * Rotation(0, 0, 90)
+        ):
+            SlotOverall(TL2_SLOT_LENGTH, TL2_SLOT_WIDTH)
+    extrude(amount=-OUTER_H, mode=Mode.SUBTRACT)
+
+    # 🔥🔥🔥 NEW RECTANGULAR CUT BELOW SLOT 🔥🔥🔥
+     # 🔥🔥🔥 RECTANGLES FLIPPED TO INNER BOTTOM SIDE 🔥🔥🔥
+
+    # ================= FIRST RECTANGLE =================
+    RECT_W = 14.0
+    RECT_H = 55.0
+    RECT_FILLET = 3.0
+
+    RECT_CX = TL2_CIRCLE_X
+    RECT_CY = TL2_CIRCLE_Y + 49.44
+
+    CUT_DEPTH = OUTER_H / 5   # control depth
+
+    # 👇 SKETCH ON INNER FLOOR
+    with BuildSketch(Plane.XY.offset(BOT_H)):
+        with Locations(C(RECT_CX, RECT_CY)):
+            RectangleRounded(RECT_W, RECT_H, RECT_FILLET)
+
+    # 👇 CUT UPWARDS (INSIDE)
+    extrude(amount=CUT_DEPTH, mode=Mode.SUBTRACT)
+
+
+    # ================= SECOND RECTANGLE =================
+    RECT_W = 14.0
+    RECT_H = 30.0
+    RECT_FILLET = 3.0
+
+    RECT_CX = TL2_CIRCLE_X
+    RECT_CY = TL2_CIRCLE_Y + 1
+
+    CUT_DEPTH = OUTER_H / 5
+
+    with BuildSketch(Plane.XY.offset(BOT_H)):
+        with Locations(C(RECT_CX, RECT_CY)):
+            RectangleRounded(RECT_W, RECT_H, RECT_FILLET)
+
+    extrude(amount=CUT_DEPTH, mode=Mode.SUBTRACT)
 
 print("[build] Done.")
 
@@ -239,6 +291,38 @@ export_stl(case.part, GEN_STL)
 print(f"\n✅ Generated STL → {GEN_STL}")
 
 # VIEWER
+try:
+    from ocp_vscode import show
+    show(case.part, reset_camera=True)
+except:
+    print("Install viewer: pip install ocp-vscode")
+
+print("[build] Done.")
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 🔥 STL EXPORT (ROBUST VERSION)
+# ─────────────────────────────────────────────────────────────────────────────
+try:
+    from build123d import export_stl
+except ImportError:
+    print("⚠️ export_stl not found, trying alternative method")
+
+# Desktop path
+desktop = os.path.join(os.path.expanduser("~"), "Desktop")
+
+# File name
+GEN_STL = os.path.join(desktop, "generated_case.stl")
+
+# Export
+try:
+    export_stl(case.part, GEN_STL)
+    print(f"\n✅ STL successfully exported to:\n{GEN_STL}")
+except Exception as e:
+    print("\n❌ STL export failed:", e)
+
+# ─────────────────────────────────────────────────────────────────────────────
+# VIEWER
+# ─────────────────────────────────────────────────────────────────────────────
 try:
     from ocp_vscode import show
     show(case.part, reset_camera=True)
