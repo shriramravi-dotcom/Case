@@ -1,0 +1,78 @@
+import os
+from build123d import *
+
+# ═══════════════════════════════════════════════════════════════════════════════
+#  GEOMETRY PARAMETERS (All values are in mm)
+# ═══════════════════════════════════════════════════════════════════════════════
+WIDTH = 230.0          # 230mm
+HEIGHT = 190.0         # 190mm
+THICKNESS = -30.0      # 30mm thick (extruding into -Y)
+FILLET_RADIUS = 50.0   # 50mm
+POCKET_OFFSET = -10.0  # 10mm inward offset
+POCKET_DEPTH = 20.0    # 20mm deep cut
+
+# ═══════════════════════════════════════════════════════════════════════════════
+#  MODEL CONSTRUCTION
+# ═══════════════════════════════════════════════════════════════════════════════
+
+with BuildPart() as model:
+    # 1. Base Block
+    # Sketch on XZ plane (Y=0)
+    with BuildSketch(Plane.XZ):
+        Rectangle(WIDTH, HEIGHT)
+    extrude(amount=THICKNESS)  # Extrudes from Y=0 to Y=-30
+    
+    # 2. Corner Fillets
+    # Filter edges parallel to Y-axis
+    vertical_edges = model.edges().filter_by(Axis.Y)
+    fillet(vertical_edges, radius=FILLET_RADIUS)
+    
+    # 3. Create Sketch on the Front Face (Y=0)
+    # Since we extruded to -30, the face at Y=0 is the "last" (highest)
+    front_face = model.faces().sort_by(Axis.Y).first
+    
+    with BuildSketch(front_face) as pocket_sketch:
+        add(front_face)
+        offset(amount=POCKET_OFFSET, mode=Mode.REPLACE)
+    
+    # 4. Extrude Cut 20mm into the body
+    extrude(amount=-POCKET_DEPTH, mode=Mode.SUBTRACT)
+
+    # 5. Add Kanji '誘' (Centered in the pocket)
+    # The pocket floor is at Y = -20mm
+    text_plane = Plane.XZ.offset(-POCKET_DEPTH)
+    
+    with BuildSketch(text_plane):
+        Text(
+            "誘", 
+            font_size=165,        # 165mm tall
+            font="Arial Unicode MS", 
+            align=(Align.CENTER, Align.CENTER), 
+            rotation=0            # Upright
+        )    
+    
+    # 6. Extrude the Kanji 30mm along the +Y axis
+    # Starts at Y=-20mm, goes through 20mm pocket, sticks out 10mm past Y=0
+    extrude(amount=20.0, mode=Mode.ADD)
+
+# ═══════════════════════════════════════════════════════════════════════════════
+#  VIEWER & EXPORT
+# ═══════════════════════════════════════════════════════════════════════════════
+
+output_file = os.path.expanduser("~/Desktop/final_model_mm.stl")
+export_stl(model.part, output_file)
+
+try:
+    from ocp_vscode import show, set_port, reset_show
+    set_port(3939)
+    reset_show()
+    show(
+        model.part, 
+        names=["Model_in_MM"], 
+        colors=["SteelBlue"],
+        render_edges=True
+    )
+    print("✓ Success! All dimensions are processed in mm.")
+    print(f"✓ File saved to Desktop: {output_file}")
+except Exception as e:
+    print(f"! Viewer Error: {e}")
