@@ -1,5 +1,21 @@
-Parametric CAD Reconstruction and Validation Using build123d
+**Parametric CAD Reconstruction and Validation Using build123d**
 
-This project focuses on reconstructing CAD geometry from STL files using a code-driven approach in Python, with the objective of achieving a near-zero volumetric and symmetric difference between the original mesh and the generated parametric model. The methodology begins by analyzing the STL file to understand its geometric features and dimensions, followed by developing a corresponding parametric script using the build123d library. Instead of relying solely on direct mesh usage, the geometry is recreated through sketches, extrusions, and feature-based operations such as fillets, chamfers, and holes, ensuring that the model remains editable and fully parameterized.
+1. Reconstruct CAD geometry from STL files using a code-driven Python approach.
 
-The generated CAD model is then compared against the original STL by evaluating properties such as volume and geometric deviation, ensuring that the difference is minimized and approaches zero, which validates the accuracy of the reconstruction. Additionally, the workflow includes importing the STL file programmatically and exporting the generated model to verify consistency and interoperability. Visualization is carried out using the OCP CAD Viewer within Visual Studio Code, allowing real-time inspection and confirmation of the model geometry. This integrated approach demonstrates how CAD models can be systematically reconstructed, validated, and visualized through code, enabling precise control over design parameters while maintaining fidelity with the original geometry.
+2. Achieve near-zero volumetric and symmetric difference between the original mesh and the parametric model.
+
+3. Analyze the STL file to determine its primary geometric features and dimensions.
+
+4. Develop a corresponding parametric script using the build123d library.
+
+5.Recreate geometry through sketches, extrusions, and operations like fillets, chamfers, and holes instead of direct mesh usage.
+
+6.Maintain a fully editable and parameterized model for future design adjustments.
+
+7. Compare the generated model against the original STL to minimize volume and geometric deviation.
+
+8. Import STL files and export generated models programmatically to verify consistency and interoperability.
+
+9. Visualize the geometry in real-time using the OCP CAD Viewer within Visual Studio Code for inspection.
+
+10.Systematically validate and maintain high fidelity with the original geometry through an integrated code workflow.
