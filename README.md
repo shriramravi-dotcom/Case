@@ -1,4 +1,4 @@
-**Parametric CAD Reconstruction and Validation Using build123d**
+## Parametric CAD Reconstruction and Validation Using build123d
 
 1. Reconstruct CAD geometry from STL files using a code-driven Python approach.
 
@@ -8,9 +8,9 @@
 
 4. Develop a corresponding parametric script using the build123d library.
 
-5.Recreate geometry through sketches, extrusions, and operations like fillets, chamfers, and holes instead of direct mesh usage.
+5. Recreate geometry through sketches, extrusions, and operations like fillets, chamfers, and holes instead of direct mesh usage.
 
-6.Maintain a fully editable and parameterized model for future design adjustments.
+6. Maintain a fully editable and parameterized model for future design adjustments.
 
 7. Compare the generated model against the original STL to minimize volume and geometric deviation.
 
@@ -18,4 +18,4 @@
 
 9. Visualize the geometry in real-time using the OCP CAD Viewer within Visual Studio Code for inspection.
 
-10.Systematically validate and maintain high fidelity with the original geometry through an integrated code workflow.
+10. Systematically validate and maintain high fidelity with the original geometry through an integrated code workflow.
